@@ -1,0 +1,24 @@
+{
+    "match" : [
+        {
+            "team1": "Longobarda",
+            "team2": "Avellino",
+            "city": "Milano"
+        },
+        {
+            "team1": "Reggio Calabria",
+            "team2": "Cosenza",
+            "city": "Catanzaro"
+        },
+        {
+            "team1": "Torino",
+            "team2": "Parma",
+            "city": "Torino"
+        },
+        {
+            "team1": "Roma",
+            "team2": "Catania",
+            "city": "Roma"
+        }
+    ]
+}
