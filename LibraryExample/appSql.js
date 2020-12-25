@@ -65,7 +65,7 @@ app.get('/library/books_table', async (req,res)=>{//creazione tabella students
     }
 })
 
-app.post('/library/students_insert', async (req,res)=>{//creazione tabella students 
+app.post('/library/students_insert', async (req,res)=>{//inserire studente in db
     try {
         con.connect((err)=> {
             if (err) throw (err);
@@ -79,7 +79,7 @@ app.post('/library/students_insert', async (req,res)=>{//creazione tabella stude
     }
 })
 
-app.post('/library/books_insert', async (req,res)=>{//creazione tabella students 
+app.post('/library/books_insert', async (req,res)=>{//inserire libro in db
     try {
         con.connect((err)=> {
             if (err) throw (err);
