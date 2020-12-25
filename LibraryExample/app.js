@@ -24,7 +24,7 @@ app.get('/books', async (req,res)=>{
 
 app.get('/single_book', async (req,res)=>{
     try {
-        const singleBook = await books.find(item=> item.title === String(req.body.title))
+        const singleBook = await books.find(item => item.title === String(req.body.title))
         res.json(singleBook)
     } catch (error) {
         res.sendStatus(400)
@@ -33,7 +33,7 @@ app.get('/single_book', async (req,res)=>{
 
 app.get('/borrowed_books', async (req,res)=>{
     try {
-        const borrowedBooks = await books.filter(item=> item.borrowed === true)
+        const borrowedBooks = await books.filter(item => item.borrowed === true)
         res.json(borrowedBooks)
     } catch (error) {
         res.sendStatus(400)
@@ -72,7 +72,7 @@ app.post('/students', async (req,res)=>{
     try {
         const studentsTotal = await students
         const newStudent = {name:String(req.body.name), surname:String(req.body.surname), district:String(req.body.district),ID:Number(req.body.ID),haveBook:Boolean(req.body.haveBook)} 
-        if (studentsTotal.find(item=>item.ID === newStudent.ID )){
+        if (studentsTotal.find(item =>item.ID === newStudent.ID )){
             res.json({message:"Already exist"})
         }
         else{
@@ -104,12 +104,29 @@ app.post('/books', async (req,res)=>{
 app.delete('/students', async (req,res)=>{
     try {
         const studentsTotal = await students
-        if (studentsTotal.find(item => item.ID !== Number(req.body.ID))) {
-            res.json({message:"Not exist"})
+        const support = []
+        if (studentsTotal) {
+            let filtered = studentsTotal.filter(item => item.ID !== Number(req.body.ID))
+            res.json(support.concat(filtered))
         }
         else{
-            studentsTotal.pop(studentsTotal.ID === req.body.ID)
-            res.json(studentsTotal)
+            res.json({message: "not exist"})
+        }
+    } catch (error) {
+        res.sendStatus(404)
+    }
+})
+
+app.delete('/books', async (req,res)=>{
+    try {
+        const booksTotal = await books
+        const support = []
+        if (booksTotal) {
+            let filtered = booksTotal.filter(item => item.number !== Number(req.body.number))
+            res.json(support.concat(filtered))
+        }
+        else{
+            res.json({message: "not exist"})
         }
     } catch (error) {
         res.sendStatus(404)

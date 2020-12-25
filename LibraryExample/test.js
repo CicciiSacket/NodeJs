@@ -3,6 +3,7 @@ const { title } = require('process');
 
 const request = require('supertest');
 const app = require('./app.js');
+const appSQL = require('./appSql.js')
 
 var chai = require('chai').should();
 
@@ -66,19 +67,71 @@ describe('POST', ()=>{
     it('student add in list', async ()=>{//aggiunta studente in lista
         const {body,status} = await request(app).post('/students').set('Accept', 'application/json').send({name:"pippo", surname:"pluto", district:"infermeria",ID:201,haveBook:true})
         status.should.equal(200) 
-        // console.log(body)
     });
     it('book add in list', async ()=>{//aggiunta libro in lista
         const {body,status} = await request(app).post('/books').set('Accept', 'application/json').send({title:"pippo", number:2010,borrowed:true})
         status.should.equal(200) 
-        // console.log(body)
     });
 });
 
 describe('DELETE', ()=>{
-    it('student delete', async ()=>{
-        const {body,status} = await request(app).delete('/students').set('Accept', 'application/json').send({ID:101})
+    it('student deleted', async ()=>{//rimozione studente dalla lista
+        const {body,status} = await request(app).delete('/students').set('Accept', 'application/json').send({ID:201})
         status.should.equal(200) 
-        console.log(body)
+    });
+    it('book deleted', async ()=>{//rimozione libro dalla lista
+        const {body,status} = await request(app).delete('/books').set('Accept', 'application/json').send({number:2010})
+        status.should.equal(200) 
     });
 });
+
+
+//testing API con query
+describe('GET /library', () => {
+    // it('creating DB ', (done) => {//creazione db,TESTATA!
+    //   request(appSQL)
+    //       .get('/library/create_db')
+    //       .set('Accept', 'application/json')
+    //       .expect(200)
+    //       .end(function(err, res) {
+    //           if (err) return done(err);
+    //           done(); 
+    //     });
+    // });
+
+    // it('creating table students', (done) => {//creazione table,TESTATA!
+    //   request(appSQL)
+    //       .get('/library/students_table')
+    //       .set('Accept', 'application/json')
+    //       .expect(200)
+    //       .end(function(err, res) {
+    //           if (err) return done(err);
+    //           done(); 
+    //     });
+    // });
+
+    // it('creating table books', (done) => {//creazione table,TESTATA!
+    //   request(appSQL)
+    //       .get('/library/books_table')
+    //       .set('Accept', 'application/json')
+    //       .expect(200)
+    //       .end(function(err, res) {
+    //           if (err) return done(err);
+    //           done(); 
+    //     });
+    // });
+}) 
+
+describe('POST', ()=>{
+    // it('student add in db', async ()=>{//aggiunta studente in db,FUNZIONA!
+    //     const {body,status} = await request(appSQL).post('/library/students_insert').set('Accept', 'application/json').send({name:"Francesco", surname:"sacco", district:"informatica",ID:108,HaveBooks:true})
+    //     console.log(body)
+    //     status.should.equal(200)
+    // });
+
+    it('book add in db', async ()=>{//aggiunta libro in db,FUNZIONA!
+        const {body,status} = await request(appSQL).post('/library/books_insert').set('Accept', 'application/json').send({title:"topolino", number:1908, borrowed:1})
+        console.log(body)
+        status.should.equal(200)
+    });
+})

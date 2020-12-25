@@ -1,0 +1,27 @@
+[
+    {
+        "title":"Topolino",
+        "number":54236,
+        "borrowed":true
+    },
+    {
+        "title":"Evoluzione",
+        "number":5296,
+        "borrowed":true
+    },
+    {
+        "title":"Python",
+        "number":52908,
+        "borrowed":false
+    },
+    {
+        "title":"ERRORE_DI_SISTEMA",
+        "number":29082,
+        "borrowed":false
+    },
+    {
+        "title":"Da Vinci",
+        "number":24619,
+        "borrowed":true
+    }
+]

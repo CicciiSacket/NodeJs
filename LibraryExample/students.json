@@ -1,0 +1,30 @@
+[
+    {
+        "name":"Francesco",
+        "surname":"Sacco",
+        "district":"Informatica",
+        "ID": 101,
+        "haveBook":false
+    },
+    {
+        "name":"Marzia",
+        "surname":"Secondo",
+        "district":"Medicina",
+        "ID": 108,
+        "haveBook":false
+    },
+    {
+        "name":"Mario",
+        "surname":"Rossi",
+        "district":"Ingegneria",
+        "ID": 113,
+        "haveBook":true
+    },
+    {
+        "name":"Matteo",
+        "surname":"Bianchi",
+        "district":"Agraria",
+        "ID": 121,
+        "haveBook":true
+    }
+]
