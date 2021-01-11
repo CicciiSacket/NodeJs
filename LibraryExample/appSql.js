@@ -1,98 +1,163 @@
-console.log('Server exe')
+var assert = require('assert');
+const { title } = require('process');
 
-const mysql = require('mysql');
-const express =  require('express')
-const bodyParser = require ('body-parser')
-const app = express()
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:true}))
-module.exports = app.listen(3008)
+const request = require('supertest');
+const app = require('./app.js');
+const appSQL = require('./appSql.js')
 
+var chai = require('chai').should();
 
-const con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "root",
-    port:8889,
-    database:"library"
+describe('GET /books', () => {
+    it('list of total books ', (done) => {//lista totale dei libri
+      request(app)
+          .get('/books')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end(function(err, res) {
+              if (err) return done(err);
+              done(); 
+        });
+    }); 
+    it('book found', async () =>{//libro per titolo
+        const {body, status} = await request(app).get('/single_book').set('Accept', 'application/json').send({title:"Python"})
+        status.should.equal(200) 
+        body.should.have.property('title')
+    });
+    it('list of borrowed books ', (done) => {//libri che sono in prestito
+        request(app)
+            .get('/borrowed_books')
+            .set('Accept', 'application/json')
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                done(); 
+        });
+    }); 
+});
+
+describe('GET /students', () => {
+    it('list of total students ', (done) => {//lista totale degli studenti
+      request(app)
+          .get('/students')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end(function(err, res) {
+              if (err) return done(err);
+              done(); 
+        });
+    }); 
+    it('student found', async () =>{//studente per matricola
+        const {body, status} = await request(app).get('/single_student').set('Accept', 'application/json').send({ID:108})
+        status.should.equal(200) 
+        body.should.have.property('ID')
+    });
+    it('list of students have\'s books ', (done) => {//studenti in possesso di un libro
+        request(app)
+            .get('/students_books')
+            .set('Accept', 'application/json')
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                done(); 
+        });
+    }); 
+});
+
+describe('POST', ()=>{
+    it('student add in list', async ()=>{//aggiunta studente in lista
+        const {body,status} = await request(app).post('/students').set('Accept', 'application/json').send({name:"pippo", surname:"pluto", district:"infermeria",ID:201,haveBook:true})
+        status.should.equal(201) 
+    });
+    it('book add in list', async ()=>{//aggiunta libro in lista
+        const {body,status} = await request(app).post('/books').set('Accept', 'application/json').send({title:"pippo", number:2010,borrowed:true})
+        status.should.equal(201) 
+    });
+});
+
+describe('DELETE', ()=>{
+    it('student deleted', async ()=>{//rimozione studente dalla lista
+        const {body,status} = await request(app).delete('/students').set('Accept', 'application/json').send({ID:201})
+        status.should.equal(200) 
+    });
+    it('book deleted', async ()=>{//rimozione libro dalla lista
+        const {body,status} = await request(app).delete('/books').set('Accept', 'application/json').send({number:2010})
+        status.should.equal(200) 
+    });
 });
 
 
-createDb = "CREATE DATABASE library"
-app.get('/library/create_db', async (req,res)=>{//creazione database
-    try {
-        con.connect((err) => {
-            if (err) throw (err);
-            con.query(createDb,(err) => {
-                if (err) throw (err);
-            });
-            res.json({message:"database created"})
-        })
-    } catch (error) {
-        res.sendStatus(400)
-    }
+//testing API con query
+
+describe('GET /library', () => {
+    it('creating DB ', (done) => {//creazione db,TESTATA!
+      request(appSQL)
+          .get('/library/create_db')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end(function(err, res) {
+              if (err) return done(err);
+              done(); 
+        });
+    });
+
+    it('creating table students', (done) => {//creazione table,TESTATA!
+      request(appSQL)
+          .get('/library/students_table')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end(function(err, res) {
+              if (err) return done(err);
+              done(); 
+        });
+    });
+
+    it('creating table books', (done) => {//creazione table,TESTATA!
+      request(appSQL)
+          .get('/library/books_table')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end(function(err, res) {
+              if (err) return done(err);
+              done(); 
+        });
+    });
+}) 
+
+describe('POST library', ()=>{
+    it('student add in db', async ()=>{//aggiunta studente in db,FUNZIONA!
+        const {body,status} = await request(appSQL).post('/library/students_insert').set('Accept', 'application/json').send({name:"Francesco", surname:"sacco", district:"informatica",ID:108,HaveBooks:true})
+        console.log(body)
+        status.should.equal(201)
+    });
+
+    it('book add in db', async ()=>{//aggiunta libro in db,FUNZIONA!
+        const {body,status} = await request(appSQL).post('/library/books_insert').set('Accept', 'application/json').send({title:"topolino", number:1908, borrowed:1})
+        console.log(body)
+        status.should.equal(201)
+    });
 })
 
+describe('DELETE library', ()=>{
+    it('book deleted', async ()=>{//rm book from db, FUNZIONA!
+        const {body,status} = await request(appSQL).delete('/library/books_deleted').set('Accept', 'application/json').send({number:1908})
+        status.should.equal(200) 
+    });
 
-createTableStudents = "CREATE TABLE students (name VARCHAR(255) NOT NULL , surname VARCHAR(255) NOT NULL, district VARCHAR(255) NOT NULL, ID INT NOT NULL PRIMARY KEY, HaveBooks INT NOT NULL)"
-app.get('/library/students_table', async (req,res)=>{//creazione tabella students 
-    try {
-        con.connect((err)=> {
-            if (err) throw (err);
-            con.query(createTableStudents,(err)=> {
-                if (err) throw (err);
-            });
-            res.json({message:"table created"})
-        })
-    } catch (error) {
-        res.sendStatus(400)
-    }
-})
+    it('students deleted', async ()=>{//rm students from db, FUNZIONA!
+        const {body,status} = await request(appSQL).delete('/library/students_deleted').set('Accept', 'application/json').send({ID:108})
+        status.should.equal(200) 
+    });
+});
 
-
-createTableBooks = "CREATE TABLE books (title VARCHAR(255) NOT NULL, number INT NOT NULL PRIMARY KEY, borrowed INT)"
-app.get('/library/books_table', async (req,res)=>{//creazione tabella students 
-    try {
-        con.connect((err)=> {
-            if (err) throw (err);
-            con.query(createTableBooks,(err)=> {
-                if (err) throw (err);
-            });
-            res.json({message:"table created"})
-        })
-    } catch (error) {
-        res.sendStatus(400)
-    }
-})
-
-app.post('/library/students_insert', async (req,res)=>{//inserire studente in db
-    try {
-        con.connect((err)=> {
-            if (err) throw (err);
-            con.query(`INSERT INTO students VALUES ('${req.body.name}','${req.body.surname}','${req.body.district}', ${req.body.ID}, ${req.body.HaveBooks})`,(err)=> {
-                if (err) throw (err);
-            });
-            res.json({message:" students insert into table"})
-        })
-    } catch (error) {
-        res.sendStatus(400)
-    }
-})
-
-app.post('/library/books_insert', async (req,res)=>{//inserire libro in db
-    try {
-        con.connect((err)=> {
-            if (err) throw (err);
-            con.query(`INSERT INTO books VALUES ('${req.body.title}','${req.body.number}','${req.body.borrowed}')`,(err)=> {
-                if (err) throw (err);
-            });
-            res.json({message:" books insert into table"})
-        })
-    } catch (error) {
-        res.sendStatus(400)
-    }
-})
-
-
-
-
+describe('GET /library', () => {
+    it(' list of students ', (done) => {//lista studenti,TESTATA!
+      request(appSQL)
+          .get('/library/students')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end(function(err, res) {
+              if (err) return done(err);
+              done(); 
+        });
+    });
+});
